@@ -873,3 +873,506 @@ a:hover { color: var(--gold-light); }
     .champion-hero-name { font-size: 2.2rem; }
     .champion-hero-content { left: 20px; bottom: 24px; }
 }
+
+.profile-page {
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+}
+
+.profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.profile-avatar-section {
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(to bottom, var(--bg-mid), var(--bg-card));
+    border-bottom: 1px solid var(--border);
+}
+
+.avatar-wrapper {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 20px rgba(200, 170, 110, 0.3);
+}
+
+.pfp-edit-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--gold);
+    color: #010a13;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.pfp-edit-btn:hover {
+    background: var(--gold-light);
+    transform: scale(1.05);
+}
+
+.profile-details {
+    padding: 30px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+/* =============================================
+   ADDITIONS v2 — Avatar + Amis + Onglets
+   À COLLER à la fin de ton style.css existant
+   ============================================= */
+
+/* ---- Avatar initial (initiale dorée) ---- */
+.avatar-initial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--bg-dark);
+    border-radius: 50%;
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    flex-shrink: 0;
+    border: 2px solid var(--gold);
+}
+
+/* ---- Wrapper avatar profil (avec bouton changer) ---- */
+.profile-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+}
+.profile-avatar-wrap > img,
+.profile-avatar-wrap > .avatar-initial {
+    width: 100px !important;
+    height: 100px !important;
+    font-size: 2rem !important;
+}
+
+.btn-avatar-change {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--bg-dark);
+    border: 2px solid var(--bg-dark);
+    font-size: .8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: filter var(--transition);
+    z-index: 2;
+}
+.btn-avatar-change:hover { filter: brightness(1.2); }
+
+.btn-avatar-delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--red-accent);
+    color: #fff;
+    border: 2px solid var(--bg-dark);
+    font-size: .65rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: filter var(--transition);
+}
+.btn-avatar-delete:hover { filter: brightness(1.2); color: #fff; }
+
+/* ---- Badge notification sidebar ---- */
+.badge-notif {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--red-accent);
+    color: #fff;
+    font-size: .65rem;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* ---- Notification inline profil ---- */
+.notif-inline {
+    margin-top: 8px;
+    color: var(--gold);
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+/* ---- Alert succès ---- */
+.alert-success {
+    background: rgba(39, 174, 96, .12);
+    border: 1px solid rgba(39, 174, 96, .4);
+    color: #6fcf97;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: .87rem;
+    margin-top: 10px;
+}
+
+/* ---- Onglets profil ---- */
+.profile-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 28px;
+}
+.profile-tab {
+    padding: 10px 22px;
+    color: var(--text-dim);
+    font-size: .88rem;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    transition: color var(--transition), border-color var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.profile-tab:hover { color: var(--gold-light); }
+.profile-tab.tab-active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+}
+.tab-count {
+    background: rgba(200,170,110,.15);
+    color: var(--gold);
+    font-size: .72rem;
+    padding: 1px 7px;
+    border-radius: 10px;
+}
+
+/* ---- Section amis ---- */
+.friends-section { margin-bottom: 32px; }
+.friends-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: .82rem;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.friends-list { display: flex; flex-direction: column; gap: 10px; }
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    transition: border-color var(--transition);
+}
+.friend-item:hover { border-color: rgba(200,170,110,.4); }
+.friend-item.friend-pending { border-color: rgba(200,170,110,.35); }
+
+.friend-avatar-link { flex-shrink: 0; }
+.friend-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.friend-name {
+    color: var(--gold-light);
+    font-weight: 600;
+    font-size: .9rem;
+    transition: color var(--transition);
+}
+.friend-name:hover { color: var(--gold); }
+.friend-date { color: var(--text-dim); font-size: .75rem; }
+
+.friend-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* Boutons d'action amis */
+.btn-friend {
+    padding: 5px 14px;
+    border-radius: var(--radius);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .3px;
+    transition: all var(--transition);
+    white-space: nowrap;
+}
+.btn-accept {
+    background: rgba(39,174,96,.15);
+    border: 1px solid rgba(39,174,96,.4);
+    color: #6fcf97;
+}
+.btn-accept:hover { background: rgba(39,174,96,.28); color: #fff; }
+
+.btn-decline {
+    background: rgba(195,64,67,.1);
+    border: 1px solid rgba(195,64,67,.3);
+    color: var(--red-accent);
+}
+.btn-decline:hover { background: rgba(195,64,67,.22); color: #fff; }
+
+.btn-add-friend {
+    background: rgba(200,170,110,.12);
+    border: 1px solid var(--border-strong);
+    color: var(--gold);
+}
+.btn-add-friend:hover { background: rgba(200,170,110,.25); color: var(--gold-light); }
+
+/* ---- Badges statut ---- */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+}
+.status-friends {
+    background: rgba(39,174,96,.12);
+    border: 1px solid rgba(39,174,96,.35);
+    color: #6fcf97;
+}
+.status-pending {
+    background: rgba(200,170,110,.1);
+    border: 1px solid var(--border);
+    color: var(--gold);
+}
+
+/* ---- Profil header avec le nouveau wrap ---- */
+.profile-section { max-width: 800px; }
+.profile-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* =============================================
+   ADDITIONS v3 — Setup, Lanes, Maîtrisés, Recherche joueurs
+   Colle ça à la fin de ton style.css
+   ============================================= */
+
+/* ---- Avatar initial ---- */
+.avatar-initial {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    color: var(--bg-dark); border-radius: 50%;
+    font-family: 'Cinzel', serif; font-weight: 900; flex-shrink: 0;
+    border: 2px solid var(--gold);
+}
+.profile-avatar-wrap {
+    position: relative; flex-shrink: 0; width: 100px; height: 100px;
+}
+.profile-avatar-wrap > img,
+.profile-avatar-wrap > .avatar-initial { width: 100px !important; height: 100px !important; font-size: 2rem !important; }
+.btn-avatar-change {
+    position: absolute; bottom: 2px; right: 2px; width: 28px; height: 28px;
+    border-radius: 50%; background: var(--gold); color: var(--bg-dark);
+    border: 2px solid var(--bg-dark); font-size: .8rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: filter var(--transition); z-index: 2;
+}
+.btn-avatar-change:hover { filter: brightness(1.2); }
+.btn-avatar-delete {
+    position: absolute; top: 2px; right: 2px; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--red-accent); color: #fff;
+    border: 2px solid var(--bg-dark); font-size: .65rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+}
+.btn-avatar-delete:hover { filter: brightness(1.2); color: #fff; }
+
+/* ---- Badge notif ---- */
+.badge-notif {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--red-accent); color: #fff; font-size: .65rem; font-weight: 700;
+    width: 18px; height: 18px; border-radius: 50%; margin-left: 6px; vertical-align: middle;
+}
+
+/* ---- Alerts ---- */
+.alert-success {
+    background: rgba(39,174,96,.12); border: 1px solid rgba(39,174,96,.4);
+    color: #6fcf97; padding: 10px 14px; border-radius: var(--radius); font-size: .87rem;
+}
+
+/* ---- Lanes display sur profil ---- */
+.profile-lanes-display { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.lane-badge.secondary { background: rgba(200,170,110,.06); color: var(--gold); opacity: .75; }
+
+/* ---- Strip champions maîtrisés (résumé en haut du profil) ---- */
+.mastered-strip {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    padding: 14px 0 20px; border-bottom: 1px solid var(--border); margin-bottom: 4px;
+}
+.mastered-mini {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    text-decoration: none;
+}
+.mastered-mini img {
+    width: 56px; height: 56px; border-radius: 4px; object-fit: cover;
+    border: 2px solid var(--gold); transition: transform var(--transition);
+}
+.mastered-mini:hover img { transform: scale(1.08); }
+.mastered-mini span { font-size: .68rem; color: var(--gold); font-family: 'Cinzel',serif; text-align: center; max-width: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- Onglets profil ---- */
+.profile-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+.profile-tab { padding: 10px 22px; color: var(--text-dim); font-size: .88rem; font-weight: 600; border-bottom: 2px solid transparent; transition: color var(--transition), border-color var(--transition); display: flex; align-items: center; gap: 6px; }
+.profile-tab:hover { color: var(--gold-light); }
+.profile-tab.tab-active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-count { background: rgba(200,170,110,.15); color: var(--gold); font-size: .72rem; padding: 1px 7px; border-radius: 10px; }
+
+/* ---- Setup form ---- */
+.setup-form { display: flex; flex-direction: column; gap: 32px; }
+.setup-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+.setup-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--gold); margin-bottom: 6px; }
+
+/* ---- Lane picker ---- */
+.lanes-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+.lane-pick-label {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 18px; background: rgba(0,0,0,.3); border: 1px solid var(--border);
+    border-radius: var(--radius); cursor: pointer; transition: all .2s; min-width: 76px;
+}
+.lane-pick-label:hover { border-color: var(--gold); background: rgba(200,170,110,.08); }
+.lane-pick-label.lane-pick-active { border-color: var(--gold); background: rgba(200,170,110,.15); }
+.lane-pick-icon { font-size: 1.4rem; }
+.lane-pick-name { font-size: .72rem; color: var(--text-dim); font-weight: 600; letter-spacing: .5px; }
+.lane-pick-active .lane-pick-name { color: var(--gold); }
+
+/* ---- Slots champions maîtrisés ---- */
+.mastered-slots { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.mastered-slot {
+    width: 90px; height: 110px;
+    background: rgba(0,0,0,.3); border: 2px dashed var(--border);
+    border-radius: var(--radius); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+    position: relative; transition: border-color var(--transition);
+}
+.mastered-slot.slot-filled { border-style: solid; border-color: var(--gold); }
+.mastered-slot img { width: 90px; height: 76px; object-fit: cover; border-radius: var(--radius) var(--radius) 0 0; position: absolute; top: 0; }
+.slot-name { position: absolute; bottom: 0; left: 0; right: 0; padding: 3px 4px; background: rgba(1,10,19,.85); font-size: .65rem; color: var(--gold-light); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot-remove { position: absolute; top: 4px; right: 4px; z-index: 2; width: 20px; height: 20px; background: var(--red-accent); border: none; border-radius: 50%; color: #fff; font-size: .65rem; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s; }
+.mastered-slot:hover .slot-remove { opacity: 1; }
+.slot-empty-icon { font-size: 1.6rem; color: var(--border); }
+.slot-empty-label { font-size: .72rem; color: var(--text-dim); }
+
+/* ---- Champion picker dropdown ---- */
+.champ-picker-wrap { position: relative; }
+.champ-picker-dropdown {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 200;
+    width: 340px; max-height: 280px; overflow-y: auto;
+    background: var(--bg-mid); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: 0 8px 32px rgba(0,0,0,.6);
+}
+.champ-picker-dropdown.open { display: block; }
+.champ-picker-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; cursor: pointer; font-size: .88rem; color: var(--text-main);
+    border-bottom: 1px solid rgba(255,255,255,.04); transition: background var(--transition);
+}
+.champ-picker-item:hover { background: rgba(200,170,110,.1); color: var(--gold-light); }
+.champ-picker-item.picker-selected { color: var(--text-dim); cursor: default; }
+.champ-picker-item img { width: 32px; height: 32px; border-radius: 2px; flex-shrink: 0; }
+.picker-check { margin-left: auto; color: var(--gold); font-size: .85rem; }
+
+/* ---- Amis ---- */
+.friends-section { margin-bottom: 28px; }
+.friends-subtitle { font-family: 'Cinzel',serif; font-size: .82rem; color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.friends-list { display: flex; flex-direction: column; gap: 10px; }
+.friend-item { display: flex; align-items: center; gap: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; transition: border-color var(--transition); }
+.friend-item:hover { border-color: rgba(200,170,110,.4); }
+.friend-item.friend-pending { border-color: rgba(200,170,110,.3); }
+.friend-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.friend-name { color: var(--gold-light); font-weight: 600; font-size: .9rem; }
+.friend-name:hover { color: var(--gold); }
+.friend-date { color: var(--text-dim); font-size: .75rem; }
+.friend-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-friend { padding: 5px 14px; border-radius: var(--radius); font-size: .78rem; font-weight: 600; transition: all var(--transition); white-space: nowrap; }
+.btn-accept { background: rgba(39,174,96,.15); border: 1px solid rgba(39,174,96,.4); color: #6fcf97; }
+.btn-accept:hover { background: rgba(39,174,96,.28); color: #fff; }
+.btn-decline { background: rgba(195,64,67,.1); border: 1px solid rgba(195,64,67,.3); color: var(--red-accent); }
+.btn-decline:hover { background: rgba(195,64,67,.22); color: #fff; }
+.btn-add-friend { background: rgba(200,170,110,.1); border: 1px solid var(--border-strong); color: var(--gold); }
+.btn-add-friend:hover { background: rgba(200,170,110,.22); color: var(--gold-light); }
+.status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+.status-friends { background: rgba(39,174,96,.12); border: 1px solid rgba(39,174,96,.35); color: #6fcf97; }
+.status-pending { background: rgba(200,170,110,.1); border: 1px solid var(--border); color: var(--gold); }
+
+/* ---- Page trouver des joueurs ---- */
+.find-section { max-width: 860px; }
+.page-title { font-family: 'Cinzel',serif; font-size: 2rem; color: var(--gold); margin-bottom: 8px; }
+.search-mode-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.search-mode-tab { padding: 10px 24px; color: var(--text-dim); font-weight: 600; font-size: .9rem; border-bottom: 2px solid transparent; transition: color var(--transition), border-color var(--transition); }
+.search-mode-tab:hover { color: var(--gold-light); }
+.search-mode-tab.smt-active { color: var(--gold); border-bottom-color: var(--gold); }
+.find-form { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+.find-input { width: 320px; }
+.find-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.find-select { min-width: 200px; }
+.btn-find { background: linear-gradient(135deg, var(--gold-dark), var(--gold)); color: var(--bg-dark); border: none; padding: 9px 22px; border-radius: var(--radius); font-weight: 700; font-size: .88rem; cursor: pointer; transition: filter var(--transition); white-space: nowrap; }
+.btn-find:hover { filter: brightness(1.12); }
+
+.find-results { margin-top: 8px; }
+.results-count { color: var(--text-dim); font-size: .85rem; margin-bottom: 16px; }
+.empty-find { text-align: center; padding: 48px 0; color: var(--text-dim); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+/* Cards joueurs */
+.player-cards { display: flex; flex-direction: column; gap: 12px; }
+.player-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; transition: border-color var(--transition); }
+.player-card:hover { border-color: rgba(200,170,110,.4); }
+.player-card-top { display: flex; align-items: center; gap: 14px; }
+.player-card-info { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.player-card-name { font-family: 'Cinzel',serif; font-size: 1rem; color: var(--gold-light); font-weight: 700; }
+.player-card-name:hover { color: var(--gold); }
+.player-card-lanes { display: flex; gap: 6px; flex-wrap: wrap; }
+.player-card-action { flex-shrink: 0; }
+.player-card-mastered { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.mastered-thumb { width: 38px; height: 38px; border-radius: 3px; border: 1px solid var(--border); object-fit: cover; transition: transform var(--transition); }
+.mastered-thumb:hover { transform: scale(1.1); border-color: var(--gold); }
+
+/* ---- Profil public : champions maîtrisés ---- */
+.mastered-section { margin-bottom: 32px; }
+.mastered-grid { display: flex; gap: 14px; flex-wrap: wrap; }
+.mastered-card { display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; }
+.mastered-card img { width: 72px; height: 72px; border-radius: 4px; border: 2px solid var(--border); object-fit: cover; transition: border-color var(--transition), transform var(--transition); }
+.mastered-card:hover img { border-color: var(--gold); transform: translateY(-3px); }
+.mastered-card span { font-size: .72rem; color: var(--gold); font-family: 'Cinzel',serif; }
+
+/* ---- Profil header ---- */
+.profile-section { max-width: 800px; }
+.profile-header { display: flex; align-items: flex-start; gap: 24px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
