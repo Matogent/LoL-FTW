@@ -1,8 +1,5 @@
 <?php
 // ============================================
-// index.php — LoL Library v3
-// Nouveautés : lanes perso, champions maîtrisés, recherche joueurs
-// ============================================
 session_start();
 include 'db.php';
 
@@ -292,7 +289,13 @@ $all_champions_list=$pdo->query("SELECT id,name FROM champions ORDER BY name ASC
         <li><a href="index.php?page=accueil"      class="<?=$page==='accueil'?'active':''?>">🏠 Accueil</a></li>
         <li><a href="index.php?page=champions"    class="<?=$page==='champions'?'active':''?>">⚔ Champions</a></li>
         <li><a href="index.php?page=find_players" class="<?=$page==='find_players'?'active':''?>">🔎 Joueurs</a></li>
+        <?php if (isAdmin()): ?>
+        <li><a href="index.php?page=admin" class="<?=$page==='admin'?'active':''?>">⚙ Admin Panel</a></li>
+        <?php endif; ?>
     </ul>
+        <?php if (isAdmin()): ?>
+        <li><a href="index.php?page=admin" class="<?=$page==='admin'?'active':''?>">⚙ Admin Panel</a></li>
+        <?php endif; ?>
     <div class="nav-bottom">
         <?php if (isLogged()): ?>
             <div class="user-badge">
@@ -819,6 +822,310 @@ $all_champions_list=$pdo->query("SELECT id,name FROM champions ORDER BY name ASC
         </div>
         <?php endforeach; ?>
     </div><?php endif; ?>
+</section>
+
+<?php elseif ($page === 'admin'):
+    if (!isAdmin()) redirect('index.php?page=accueil');
+    
+    $admin_tab = $_GET['tab'] ?? 'dashboard';
+    
+    // Données dashboard
+    $stmt = $pdo->query("SELECT COUNT(*) FROM users");
+    $total_users = (int)$stmt->fetchColumn();
+    $stmt = $pdo->query("SELECT COUNT(*) FROM comments");
+    $total_comments = (int)$stmt->fetchColumn();
+    $stmt = $pdo->query("SELECT COUNT(*) FROM champions");
+    $total_champions = (int)$stmt->fetchColumn();
+    
+    // Utilisateurs récents
+    $stmt = $pdo->query("SELECT id, username, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 10");
+    $recent_users = $stmt->fetchAll();
+    
+    // Commentaires récents
+    $stmt = $pdo->query("SELECT c.id, c.content, c.rating, c.created_at, u.username, ch.name AS champion_name 
+                         FROM comments c 
+                         JOIN users u ON c.user_id = u.id 
+                         JOIN champions ch ON c.champion_id = ch.id 
+                         ORDER BY c.created_at DESC LIMIT 15");
+    $recent_comments = $stmt->fetchAll();
+    
+    // Tous les utilisateurs (pour tab gestion)
+    $all_users = [];
+    $search_user = $_GET['search_user'] ?? '';
+    if ($admin_tab === 'users') {
+        $sql = "SELECT id, username, email, role, created_at, avatar_url, lane_main, lane_second FROM users WHERE 1=1";
+        if ($search_user !== '') {
+            $sql .= " AND (username LIKE ? OR email LIKE ?)";
+            $stmt = $pdo->prepare($sql . " ORDER BY created_at DESC");
+            $stmt->execute(['%'.$search_user.'%', '%'.$search_user.'%']);
+        } else {
+            $stmt = $pdo->prepare($sql . " ORDER BY created_at DESC");
+            $stmt->execute();
+        }
+        $all_users = $stmt->fetchAll();
+    }
+    
+    // Tous les commentaires (pour tab gestion)
+    $all_comments_admin = [];
+    $search_comment = $_GET['search_comment'] ?? '';
+    if ($admin_tab === 'comments') {
+        $sql = "SELECT c.id, c.content, c.rating, c.created_at, u.id AS user_id, u.username, ch.id AS champion_id, ch.name AS champion_name 
+                FROM comments c 
+                JOIN users u ON c.user_id = u.id 
+                JOIN champions ch ON c.champion_id = ch.id 
+                WHERE 1=1";
+        if ($search_comment !== '') {
+            $sql .= " AND (u.username LIKE ? OR c.content LIKE ? OR ch.name LIKE ?)";
+            $stmt = $pdo->prepare($sql . " ORDER BY c.created_at DESC");
+            $stmt->execute(['%'.$search_comment.'%', '%'.$search_comment.'%', '%'.$search_comment.'%']);
+        } else {
+            $stmt = $pdo->prepare($sql . " ORDER BY c.created_at DESC");
+            $stmt->execute();
+        }
+        $all_comments_admin = $stmt->fetchAll();
+    }
+?>
+
+<!-- ====== ADMIN PANEL ====== -->
+<section class="admin-section">
+    <div class="admin-header">
+        <h1 class="admin-title">⚙ Panneau Admin</h1>
+        <a href="index.php?page=accueil" class="btn-back">← Retour</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+        <a href="index.php?page=admin&tab=dashboard" class="admin-tab <?= $admin_tab === 'dashboard' ? 'admin-tab-active' : '' ?>">📊 Dashboard</a>
+        <a href="index.php?page=admin&tab=users" class="admin-tab <?= $admin_tab === 'users' ? 'admin-tab-active' : '' ?>">👥 Utilisateurs</a>
+        <a href="index.php?page=admin&tab=comments" class="admin-tab <?= $admin_tab === 'comments' ? 'admin-tab-active' : '' ?>">💬 Commentaires</a>
+        <a href="index.php?page=admin&tab=champions" class="admin-tab <?= $admin_tab === 'champions' ? 'admin-tab-active' : '' ?>">⚔ Champions</a>
+    </div>
+
+    <!-- ---- TAB: DASHBOARD ---- -->
+    <?php if ($admin_tab === 'dashboard'): ?>
+    <div class="admin-body">
+        <div class="admin-stats">
+            <div class="stat-card">
+                <span class="stat-icon">👥</span>
+                <div class="stat-info">
+                    <span class="stat-label">Utilisateurs</span>
+                    <span class="stat-value"><?= $total_users ?></span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">💬</span>
+                <div class="stat-info">
+                    <span class="stat-label">Commentaires</span>
+                    <span class="stat-value"><?= $total_comments ?></span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⚔</span>
+                <div class="stat-info">
+                    <span class="stat-label">Champions</span>
+                    <span class="stat-value"><?= $total_champions ?></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Utilisateurs récents -->
+            <div class="admin-widget">
+                <h3 class="widget-title">Utilisateurs récents</h3>
+                <div class="widget-list">
+                    <?php if (empty($recent_users)): ?>
+                        <p class="muted">Aucun utilisateur.</p>
+                    <?php else: ?>
+                        <?php foreach ($recent_users as $u): ?>
+                        <div class="widget-item">
+                            <div class="item-info">
+                                <span class="item-name"><?= h($u['username']) ?></span>
+                                <span class="item-sub"><?= h($u['email']) ?></span>
+                                <span class="item-date"><?= date('d/m/Y H:i', strtotime($u['created_at'])) ?></span>
+                            </div>
+                            <span class="item-badge <?= $u['role'] === 'admin' ? 'badge-admin' : 'badge-user' ?>">
+                                <?= $u['role'] === 'admin' ? '⚙' : '✦' ?>
+                            </span>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Commentaires récents -->
+            <div class="admin-widget">
+                <h3 class="widget-title">Commentaires récents</h3>
+                <div class="widget-list">
+                    <?php if (empty($recent_comments)): ?>
+                        <p class="muted">Aucun commentaire.</p>
+                    <?php else: ?>
+                        <?php foreach ($recent_comments as $cm): ?>
+                        <div class="widget-item">
+                            <div class="item-info">
+                                <span class="item-name"><?= h($cm['username']) ?> → <?= h($cm['champion_name']) ?></span>
+                                <span class="item-sub"><?= h(substr($cm['content'], 0, 60)) ?><?= strlen($cm['content']) > 60 ? '…' : '' ?></span>
+                                <span class="item-date"><?= date('d/m/Y H:i', strtotime($cm['created_at'])) ?></span>
+                            </div>
+                            <?php if ($cm['rating']): ?>
+                                <span class="item-badge">⭐ <?= $cm['rating'] ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---- TAB: UTILISATEURS ---- -->
+    <?php elseif ($admin_tab === 'users'): ?>
+    <div class="admin-body">
+        <div class="admin-search-bar">
+            <form method="GET" action="index.php" class="search-form">
+                <input type="hidden" name="page" value="admin">
+                <input type="hidden" name="tab" value="users">
+                <input type="text" name="search_user" value="<?= h($search_user) ?>" placeholder="🔍 Rechercher un utilisateur…" class="filter-search">
+                <button type="submit" class="btn-search">Rechercher</button>
+                <?php if ($search_user !== ''): ?>
+                    <a href="index.php?page=admin&tab=users" class="btn-reset">✕ Reset</a>
+                <?php endif; ?>
+            </form>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Pseudo</th>
+                        <th>Email</th>
+                        <th>Rôle</th>
+                        <th>Lanes</th>
+                        <th>Inscrit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($all_users)): ?>
+                    <tr><td colspan="6" class="muted" style="text-align:center;padding:16px;">Aucun utilisateur trouvé.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($all_users as $u): ?>
+                        <tr>
+                            <td><strong><?= h($u['username']) ?></strong></td>
+                            <td><?= h($u['email']) ?></td>
+                            <td>
+                                <span class="badge <?= $u['role'] === 'admin' ? 'badge-admin' : 'badge-user' ?>">
+                                    <?= $u['role'] === 'admin' ? '⚙ Admin' : '✦ User' ?>
+                                </span>
+                            </td>
+                            <td>
+                                <?php if ($u['lane_main']): ?>
+                                    <span class="lane-badge"><?= h($u['lane_main']) ?></span>
+                                    <?php if ($u['lane_second']): ?><span class="lane-badge secondary"><?= h($u['lane_second']) ?></span><?php endif; ?>
+                                <?php else: ?>
+                                    <span class="muted">-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
+                            <td>
+                                <a href="index.php?page=user&id=<?= $u['id'] ?>" class="btn-admin-small">Voir profil</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ---- TAB: COMMENTAIRES ---- -->
+    <?php elseif ($admin_tab === 'comments'): ?>
+    <div class="admin-body">
+        <div class="admin-search-bar">
+            <form method="GET" action="index.php" class="search-form">
+                <input type="hidden" name="page" value="admin">
+                <input type="hidden" name="tab" value="comments">
+                <input type="text" name="search_comment" value="<?= h($search_comment) ?>" placeholder="🔍 Chercher par pseudo, champion ou contenu…" class="filter-search">
+                <button type="submit" class="btn-search">Rechercher</button>
+                <?php if ($search_comment !== ''): ?>
+                    <a href="index.php?page=admin&tab=comments" class="btn-reset">✕ Reset</a>
+                <?php endif; ?>
+            </form>
+        </div>
+
+        <div class="admin-comments-list">
+            <?php if (empty($all_comments_admin)): ?>
+            <p class="muted" style="text-align:center;padding:24px;">Aucun commentaire trouvé.</p>
+            <?php else: ?>
+                <?php foreach ($all_comments_admin as $cm): ?>
+                <div class="admin-comment">
+                    <div class="admin-comment-header">
+                        <span class="admin-comment-user">
+                            <strong><?= h($cm['username']) ?></strong>
+                            sur
+                            <strong><?= h($cm['champion_name']) ?></strong>
+                        </span>
+                        <span class="admin-comment-date"><?= date('d/m/Y H:i', strtotime($cm['created_at'])) ?></span>
+                    </div>
+                    <?php if ($cm['rating']): ?>
+                    <div class="admin-comment-rating">
+                        <?php for ($s=1; $s<=5; $s++) echo '<span class="star '.($s<=$cm['rating']?'star-on':'').'">★</span>'; ?>
+                    </div>
+                    <?php endif; ?>
+                    <p class="admin-comment-content"><?= nl2br(h($cm['content'])) ?></p>
+                    <div class="admin-comment-actions">
+                        <a href="index.php?page=champion&id=<?= $cm['champion_id'] ?>#comments" class="btn-admin-small">Voir sur champion</a>
+                        <a href="index.php?delete_comment=<?= $cm['id'] ?>&champion_id=<?= $cm['champion_id'] ?>" class="btn-admin-small btn-danger" onclick="return confirm('Supprimer ce commentaire ?')">Supprimer</a>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- ---- TAB: CHAMPIONS ---- -->
+    <?php elseif ($admin_tab === 'champions'): ?>
+    <div class="admin-body">
+        <div class="admin-header-small">
+            <a href="index.php?page=champions&action=add" class="btn-auth" style="max-width:200px;">+ Ajouter un champion</a>
+        </div>
+
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Titre</th>
+                        <th>Rôle principal</th>
+                        <th>Lane</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $stmt = $pdo->query("SELECT * FROM champions ORDER BY name ASC");
+                    $champs = $stmt->fetchAll();
+                    ?>
+                    <?php if (empty($champs)): ?>
+                    <tr><td colspan="5" class="muted" style="text-align:center;padding:16px;">Aucun champion.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($champs as $c): ?>
+                        <tr>
+                            <td><strong><?= h($c['name']) ?></strong></td>
+                            <td><?= h($c['title'] ?? '') ?></td>
+                            <td><?= h($c['role_primary'] ?? '') ?></td>
+                            <td><?= h($c['lane'] ?? '') ?></td>
+                            <td>
+                                <a href="index.php?page=champion&id=<?= $c['id'] ?>" class="btn-admin-small">Voir</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <?php endif; // admin tabs ?>
 </section>
 
 <?php else: ?>

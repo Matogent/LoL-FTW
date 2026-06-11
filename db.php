@@ -1,11 +1,19 @@
 <?php
-// ============================================
-// db.php — Connexion PDO
-// ============================================
-$host   = 'localhost';
-$dbname = 'lol_library';
-$user   = 'root';
-$pass   = '';  // Vide par défaut sur XAMPP
+
+
+if ($_SERVER['REMOTE_ADDR'] === '127.0.0.1' || $_SERVER['REMOTE_ADDR'] === '::1') {
+    // Configuration Locale (votre PC)
+    $host   = 'localhost';
+    $dbname = 'lol_library';
+    $user   = 'root';
+    $pass   = ''; 
+} else {
+ 
+    $host   = 'nom_du_serveur_sql'; // ex: sql.hebergeur.com ou localhost
+    $dbname = 'votre_nom_de_bdd';
+    $user   = 'votre_utilisateur_bdd';
+    $pass   = 'votre_mot_de_passe_bdd';
+}
 
 try {
     $pdo = new PDO(
@@ -19,5 +27,7 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die("Erreur BDD : " . $e->getMessage());
+ 
+    error_log("Erreur BDD : " . $e->getMessage());
+    die("Une erreur de connexion est survenue. Veuillez réessayer plus tard.");
 }
